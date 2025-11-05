@@ -146,5 +146,29 @@ namespace Taetigkeitsaufzeichnung.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var lehrer = await _context.Lehrer
+                .Include(l => l.Taetigkeiten)
+                .Include(l => l.SchuljahrSollstunden)
+                .FirstOrDefaultAsync(l => l.LehrerID == id);
+                    
+            if (lehrer == null)
+            {
+                return NotFound();
+            }
+
+            // Remove all related records first
+            _context.Taetigkeiten.RemoveRange(lehrer.Taetigkeiten);
+            _context.LehrerSchuljahrSollstunden.RemoveRange(lehrer.SchuljahrSollstunden);
+                
+            // Then remove the teacher
+            _context.Lehrer.Remove(lehrer);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
