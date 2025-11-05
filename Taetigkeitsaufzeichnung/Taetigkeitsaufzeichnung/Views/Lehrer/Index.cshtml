@@ -1,0 +1,122 @@
+﻿@model IEnumerable<Taetigkeitsaufzeichnung.ViewModels.LehrerIndexViewModel>
+
+@{
+    ViewData["Title"] = "Lehrerübersicht";
+    Layout = null;
+}
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <style>
+        .table-bordered tbody td:nth-child(3) { 
+            background-color: #f8d7da;
+            padding: 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .table-bordered tbody td:nth-child(3) button {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            margin: 0;
+            border: none;
+            color: #721c24;
+            background-color: transparent;
+            font-weight: bold;
+        }
+
+        .header-ui {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #e9ecef;
+            width: 100%;
+        }
+
+        .full-width-header {
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+
+        }
+
+        .user-icon {
+            width: 40px;
+            height: 40px;
+            background-color: black;
+            border-radius: 50%;
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+
+        .table-bordered {
+            border-width: 2px !important;
+        }
+        .table-bordered th, .table-bordered td {
+            border-width: 2px !important;
+            padding: 0.75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="full-width-header">
+        <div class="header-ui">
+            <div class="logo-placeholder">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fb/HTL_Waidhofen_Ybbs.png" alt="Logo" style="height:75px; margin-right:10px; max-width: 100%;" class="img-fluid" />
+            </div>
+            <div class="user-info">
+                <span class="d-none d-sm-inline">“Lehrername”</span>
+                <div class="user-icon"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container my-4">
+        <p class="mb-4">
+            <a asp-action="Create" class="btn btn-primary">Neuen Lehrer anlegen</a>
+        </p>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr class="table-secondary">
+                        <th class="text-center">Lehrername</th>
+                        <th class="text-center">Zu erreichende Stunden</th>
+                        <th class="text-center">Löschen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+
+                            <td class="text-center">
+                                <span class="text-secondary">@item.LehrerID</span>
+                            </td>
+
+                            <td class="text-center">
+                                <form asp-action="Delete" asp-route-id="@item.LehrerID" method="post">
+                                    <button type="submit" class="btn btn-danger btn-block">Löschen</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+
+                    <tr><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td></tr>
+                    <tr><td></td><td></td><td></td></tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
