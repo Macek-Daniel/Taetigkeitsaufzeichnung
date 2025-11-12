@@ -8,7 +8,6 @@
 
     <ItemGroup>
       <Folder Include="Views\Admin\" />
-      <Folder Include="Views\Lehrer\" />
     </ItemGroup>
 
     <ItemGroup>

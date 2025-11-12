@@ -20,6 +20,7 @@ namespace Taetigkeitsaufzeichnung.ViewModels
         [Required(ErrorMessage = "Nachname ist erforderlich")]
         [StringLength(100)]
         public string Nachname { get; set; }
+        public int Sollstunden { get; set; }
     }
 
     public class LehrerEditViewModel
