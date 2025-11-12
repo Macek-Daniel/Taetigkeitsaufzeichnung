@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Taetigkeitsaufzeichnung.Models
 {
-    public class LehrerSchuljahrSollstunde
+    public class LehrerSchuljahrSollstunden
     {
         public int LehrerID { get; set; }
         public int SchuljahrID { get; set; }

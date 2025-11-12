@@ -19,6 +19,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
 
         public async Task<IActionResult> Index()
         {
+            int currentSchuljahrId = 2;
             var lehrer = await _context.Lehrer
                 .OrderBy(l => l.Nachname)
                 .ThenBy(l => l.Vorname)
@@ -27,8 +28,11 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     LehrerID = l.LehrerID,
                     Vorname = l.Vorname,
                     Nachname = l.Nachname,
-                    IsActive = l.IsActive
-                })
+                    IsActive = l.IsActive,
+                    Sollstunden = _context.LehrerSchuljahrSollstunden
+                        .Where(ls => ls.LehrerID == l.LehrerID && ls.SchuljahrID == currentSchuljahrId)
+                        .Select(ls => ls.Sollstunden)
+                        .FirstOrDefault()                })
                 .ToListAsync();
             
             return View(lehrer); 
@@ -43,6 +47,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LehrerCreateViewModel vm)
         {
+            int currentSchuljahrId = 2;
             if (ModelState.IsValid)
             {
                 var lehrer = new Lehrer
@@ -51,9 +56,21 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     Nachname = vm.Nachname,
                     IsActive = true 
                 };
-
+                
                 _context.Add(lehrer);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
+
+                var lehrerSchuljahrSollstunden = new LehrerSchuljahrSollstunden
+                {
+                    Lehrer = lehrer,
+                    SchuljahrID = currentSchuljahrId,
+                    Sollstunden = vm.Sollstunden
+                };
+                if (await _context.LehrerSchuljahrSollstunden.FirstOrDefaultAsync(ls => ls.LehrerID == lehrer.LehrerID && ls.SchuljahrID == currentSchuljahrId) == null)
+                {
+                    _context.Add(lehrerSchuljahrSollstunden);
+                    await _context.SaveChangesAsync();
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(vm); 

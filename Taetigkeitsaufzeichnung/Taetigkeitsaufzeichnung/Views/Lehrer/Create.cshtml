@@ -4,8 +4,6 @@
     Layout = null;
 }
 
-<!DOCTYPE html>
-
 <html>
 <head>
     <title>Lehrer erstellen</title>
@@ -70,21 +68,6 @@
             justify-content: flex-start;
         }
 
-        @media (max-width: 576px) {
-            .button-group {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                margin-top: 10px;
-            }
-
-            .button-group a.btn-secondary {
-                margin-right: 0;
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -106,9 +89,9 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Stunden" class="control-label">Stunden:</label>
-                <input asp-for="Stunden" type="number" class="form-control" value="20" />
-                <span asp-validation-for="Stunden" class="text-danger"></span>
+                <label asp-for="Sollstunden" class="control-label">Stunden:</label>
+                <input asp-for="Sollstunden" type="number" class="form-control" value="20" />
+                <span asp-validation-for="Sollstunden" class="text-danger"></span>
             </div>
 
             <div class="button-group">

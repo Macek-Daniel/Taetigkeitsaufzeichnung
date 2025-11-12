@@ -14,11 +14,11 @@ namespace Taetigkeitsaufzeichnung.Data
         public DbSet<Schuljahr> Schuljahre { get; set; }
         public DbSet<Projekt> Projekte { get; set; }
         public DbSet<Taetigkeit> Taetigkeiten { get; set; }
-        public DbSet<LehrerSchuljahrSollstunde> LehrerSchuljahrSollstunden { get; set; }
+        public DbSet<LehrerSchuljahrSollstunden> LehrerSchuljahrSollstunden { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<LehrerSchuljahrSollstunde>()
+            modelBuilder.Entity<LehrerSchuljahrSollstunden>()
                 .HasKey(lss => new { lss.LehrerID, lss.SchuljahrID });
 
             modelBuilder.Entity<Taetigkeit>()
@@ -33,13 +33,13 @@ namespace Taetigkeitsaufzeichnung.Data
                 .HasForeignKey(t => t.ProjektID)
                 .OnDelete(DeleteBehavior.Restrict);
             
-            modelBuilder.Entity<LehrerSchuljahrSollstunde>()
+            modelBuilder.Entity<LehrerSchuljahrSollstunden>()
                 .HasOne(lss => lss.Lehrer)
                 .WithMany(l => l.SchuljahrSollstunden)
                 .HasForeignKey(lss => lss.LehrerID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<LehrerSchuljahrSollstunde>()
+            modelBuilder.Entity<LehrerSchuljahrSollstunden>()
                 .HasOne(lss => lss.Schuljahr)
                 .WithMany(s => s.LehrerSollstunden)
                 .HasForeignKey(lss => lss.SchuljahrID)

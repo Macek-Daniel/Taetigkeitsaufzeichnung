@@ -20,6 +20,6 @@ namespace Taetigkeitsaufzeichnung.Models
         [Required]
         public DateOnly Enddatum { get; set; } 
 
-        public ICollection<LehrerSchuljahrSollstunde> LehrerSollstunden { get; set; }
+        public ICollection<LehrerSchuljahrSollstunden> LehrerSollstunden { get; set; }
     }
 }

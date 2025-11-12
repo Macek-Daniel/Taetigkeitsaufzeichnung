@@ -9,6 +9,8 @@ namespace Taetigkeitsaufzeichnung.ViewModels
         public string Nachname { get; set; }
         public bool IsActive { get; set; }
         public string FullName => $"{Vorname} {Nachname}";
+        public decimal Sollstunden { get; set; }
+
     }
 
     public class LehrerCreateViewModel

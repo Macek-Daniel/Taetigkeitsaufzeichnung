@@ -18,6 +18,6 @@ namespace Taetigkeitsaufzeichnung.Models
         public bool IsActive { get; set; } = true;
 
         public ICollection<Taetigkeit> Taetigkeiten { get; set; }
-        public ICollection<LehrerSchuljahrSollstunde> SchuljahrSollstunden { get; set; }
+        public ICollection<LehrerSchuljahrSollstunden> SchuljahrSollstunden { get; set; }
     }
 }
