@@ -1,0 +1,152 @@
+﻿@*
+*@
+@{
+}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeit-/Aufgabenerfassung UI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .time-entry-form {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            width: calc(25% - 15px);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+            .input-group label {
+                font-size: 1rem;
+                color: #333;
+                font-weight: bold;
+                text-align: center;
+            }
+
+        .input-wrapper {
+            background-color: #e0e0e0; 
+            border-radius: 20px;
+            height: 40px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+            .input-wrapper input,
+            .input-wrapper select {
+                background: none;
+                border: none;
+                width: 100%;
+                font-size: 1rem;
+                color: #333;
+                outline: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                cursor: pointer;
+            }
+
+        .project-select-wrapper {
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 0 10px;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.4c-4.8%200-9.3%202.1-12.8%205.4-3.5%203.3-5.4%207.9-5.4%2012.8%200%204.8%202.1%209.3%205.4%2012.8l127.8%20127.9c3.5%203.5%208%205.4%2012.8%205.4s9.3-2.1%2012.8-5.4l127.8-127.9c3.5-3.5%205.4-8%205.4-12.8-.1-5-2-9.5-5.3-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat, repeat;
+            background-position: right 10px center, 0 0;
+            background-size: 8px auto, 100%;
+        }
+
+
+        .add-button {
+            background-color: #d0d0d0;
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 150px;
+            height: 50px;
+        }
+
+            .add-button:hover {
+                background-color: #bdbdbd;
+            }
+
+        }
+    </style>
+</head>
+<body>
+
+    <form class="time-entry-form">
+        <div class="input-columns">
+
+            <div class="input-group">
+                <label for="date">Datum</label>
+                <div class="input-wrapper">
+                    <input type="date" id="date" name="date" aria-label="Datum">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="activity">Tätigkeit</label>
+                <div class="input-wrapper">
+                    <input type="text" id="activity" name="activity" placeholder="" aria-label="Tätigkeit">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="project">Projekt</label>
+                <div class="input-wrapper project-select-wrapper">
+                    <select id="project" name="project" aria-label="Projekt auswählen">
+                        <option value="" disabled selected></option>
+                        <option value="p1">Projekt Alpha</option>
+                        <option value="p2">Projekt Beta</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="duration">Dauer</label>
+                <div class="input-wrapper">
+                    <input type="text" id="duration" name="duration" placeholder="" aria-label="Dauer">
+                </div>
+            </div>
+
+        </div>
+
+        <button type="submit" class="add-button">Hinzufügen</button>
+    </form>
+</body>
+</html>
