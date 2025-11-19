@@ -3,7 +3,6 @@ BEGIN
     CREATE DATABASE Taetigkeitsaufzeichnung;
 END
 GO
-
 USE Taetigkeitsaufzeichnung;
 GO
 

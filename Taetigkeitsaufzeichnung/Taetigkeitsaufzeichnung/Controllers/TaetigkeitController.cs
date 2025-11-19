@@ -19,12 +19,13 @@ namespace Taetigkeitsaufzeichnung.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        private async Task PrepareDashboardData(TaetigkeitDashboardViewModel vm)
         {
-            var taetigkeiten = await _context.Taetigkeiten
+            vm.Historie = await _context.Taetigkeiten
                 .Include(t => t.Lehrer)
-                .Include(t => t.Projekt) 
+                .Include(t => t.Projekt)
                 .OrderByDescending(t => t.Datum)
+                .ThenByDescending(t => t.TaetigkeitID)
                 .Select(t => new TaetigkeitIndexViewModel
                 {
                     TaetigkeitID = t.TaetigkeitID,
@@ -36,112 +37,6 @@ namespace Taetigkeitsaufzeichnung.Controllers
                 })
                 .ToListAsync();
 
-            return View(taetigkeiten);
-        }
-
-        public async Task<IActionResult> Create()
-        {
-            var vm = new TaetigkeitCreateEditViewModel();
-            await PopulateDropdowns(vm);
-            return View(vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TaetigkeitCreateEditViewModel vm)
-        {
-            if (ModelState.IsValid)
-            {
-                var taetigkeit = new Taetigkeit
-                {
-                    Datum = vm.Datum,
-                    Beschreibung = vm.Beschreibung,
-                    DauerStunden = vm.DauerStunden,
-                    LehrerID = vm.LehrerID,
-                    ProjektID = vm.ProjektID
-                };
-
-                _context.Add(taetigkeit);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            await PopulateDropdowns(vm);
-            return View(vm);
-        }
-
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var taetigkeit = await _context.Taetigkeiten.FindAsync(id);
-            if (taetigkeit == null) return NotFound();
-
-            var vm = new TaetigkeitCreateEditViewModel
-            {
-                TaetigkeitID = taetigkeit.TaetigkeitID,
-                Datum = taetigkeit.Datum,
-                Beschreibung = taetigkeit.Beschreibung,
-                DauerStunden = taetigkeit.DauerStunden,
-                LehrerID = taetigkeit.LehrerID,
-                ProjektID = taetigkeit.ProjektID
-            };
-            
-            await PopulateDropdowns(vm);
-            return View(vm);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TaetigkeitCreateEditViewModel vm)
-        {
-            if (id != vm.TaetigkeitID) return NotFound();
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var taetigkeit = await _context.Taetigkeiten.FindAsync(id);
-                    if (taetigkeit == null) return NotFound();
-
-                    taetigkeit.Datum = vm.Datum;
-                    taetigkeit.Beschreibung = vm.Beschreibung;
-                    taetigkeit.DauerStunden = vm.DauerStunden;
-                    taetigkeit.LehrerID = vm.LehrerID;
-                    taetigkeit.ProjektID = vm.ProjektID;
-
-                    _context.Update(taetigkeit);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Taetigkeiten.Any(e => e.TaetigkeitID == vm.TaetigkeitID))
-                        return NotFound();
-                    else
-                        throw;
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            await PopulateDropdowns(vm);
-            return View(vm);
-        }
-        
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var taetigkeit = await _context.Taetigkeiten.FindAsync(id);
-            if (taetigkeit != null)
-            {
-                _context.Taetigkeiten.Remove(taetigkeit);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private async Task PopulateDropdowns(TaetigkeitCreateEditViewModel vm)
-        {
             vm.LehrerListe = await _context.Lehrer
                 .Where(l => l.IsActive)
                 .OrderBy(l => l.Nachname)
@@ -160,6 +55,57 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     Text = p.Projektname
                 })
                 .ToListAsync();
+        }
+
+        // GET: Taetigkeit/Index (Dashboard)
+        public async Task<IActionResult> Index()
+        {
+            var vm = new TaetigkeitDashboardViewModel();
+            await PrepareDashboardData(vm);
+            return View(vm);
+        }
+
+        // POST: Taetigkeit/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind(Prefix = "NeueTaetigkeit")] TaetigkeitCreateEditViewModel neueTaetigkeit)
+        {
+            if (ModelState.IsValid)
+            {
+                var taetigkeit = new Taetigkeit
+                {
+                    Datum = neueTaetigkeit.Datum,
+                    Beschreibung = neueTaetigkeit.Beschreibung,
+                    DauerStunden = neueTaetigkeit.DauerStunden,
+                    LehrerID = neueTaetigkeit.LehrerID,
+                    ProjektID = neueTaetigkeit.ProjektID
+                };
+
+                _context.Add(taetigkeit);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            var vm = new TaetigkeitDashboardViewModel();
+            vm.NeueTaetigkeit = neueTaetigkeit;
+            
+            await PrepareDashboardData(vm);
+
+            return View("Index", vm);
+        }
+
+        // POST: Taetigkeit/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var taetigkeit = await _context.Taetigkeiten.FindAsync(id);
+            if (taetigkeit != null)
+            {
+                _context.Taetigkeiten.Remove(taetigkeit);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
