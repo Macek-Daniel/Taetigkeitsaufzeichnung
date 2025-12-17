@@ -1,31 +1,54 @@
-html {
-  font-size: 14px;
+/* Base & variables */
+:root {
+  --border-color: #ccc;
+  --htl-blue: #005baa;
+  --htl-red: #e60000;
+  --htl-yellow: #ffcc00;
+  --htl-green: #8cb400;
+  --bg-color: #f4f4f9;
+  --text-color: #333;
+  --card-bg: #ffffff;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+html { font-size: 14px; position: relative; min-height: 100%; }
+@media (min-width: 768px) { html { font-size: 16px; } }
+
+body { margin-bottom: 60px; background-color: var(--bg-color); color: var(--text-color); }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem var(--htl-blue);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder { color: var(--bs-secondary-color); text-align: end; }
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder { text-align: start; }
 
-body {
-  margin-bottom: 60px;
-}
+/* HTL themed helpers */
+.btn-htl { background-color: var(--htl-blue); border-color: var(--htl-blue); color: #fff; }
+.btn-htl:hover, .btn-htl:focus { background-color: #004a8c; border-color: #004a8c; color: #fff; }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
+/* Activity page (Taetigkeit/Index) */
+#activity-page { padding-top: 1rem; padding-bottom: 2rem; }
+@media (min-width: 576px) { #activity-page { padding-top: 1.5rem; } }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+#activity-creation-form .card { background-color: var(--card-bg); border-color: var(--border-color); }
+
+.validation-summary {
+  color: var(--htl-red);
+  background-color: rgba(230, 0, 0, 0.06);
+  padding: .75rem;
+  border: 1px solid rgba(230, 0, 0, 0.2);
+  border-radius: .5rem;
+}
+.validation-summary ul { margin: 0; padding-left: 1rem; }
+
+#history-table thead th { text-align: center; }
+
+/* Lehrer badges */
+.badge-active {
+  background-color: var(--htl-green);
+  color: #fff;
+}
+.badge-inactive {
+  background-color: #adb5bd;
+  color: #212529;
 }

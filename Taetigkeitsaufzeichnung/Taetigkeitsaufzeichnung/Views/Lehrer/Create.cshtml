@@ -1,104 +1,51 @@
 @model Taetigkeitsaufzeichnung.ViewModels.LehrerCreateViewModel
 
 @{
-    Layout = null;
+    ViewData["Title"] = "Lehrer anlegen";
 }
 
-<html>
-<head>
-    <title>Lehrer erstellen</title>
+<section id="teachers-create-page" class="pt-3 pb-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h1 class="h5 mb-3">Neuen Lehrer anlegen</h1>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <div asp-validation-summary="All" class="validation-summary mb-3"></div>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+                        <form asp-action="Create" method="post">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="Vorname" class="form-label">Vorname</label>
+                                    <input asp-for="Vorname" class="form-control" />
+                                    <span asp-validation-for="Vorname" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="Nachname" class="form-label">Nachname</label>
+                                    <input asp-for="Nachname" class="form-control" />
+                                    <span asp-validation-for="Nachname" class="text-danger small"></span>
+                                </div>
 
-        form {
-            width: 100%; 
-            max-width: 600px; 
-        }
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="Sollstunden" class="form-label">Sollstunden</label>
+                                    <input asp-for="Sollstunden" type="number" class="form-control" />
+                                    <span asp-validation-for="Sollstunden" class="text-danger small"></span>
+                                </div>
+                            </div>
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .control-label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px; 
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block; 
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .button-group {
-            margin-top: 20px;
-            display: flex;
-            justify-content: flex-start;
-        }
-
-    </style>
-</head>
-<body>
-    <div>
-        <h4>Neuen Lehrer erstellen</h4>
-        <hr />
-        <form asp-action="Create">
-
-            <div class="form-group">
-                <label asp-for="Vorname" class="control-label"></label>
-                <input asp-for="Vorname" class="form-control" value="" />
-                <span asp-validation-for="Vorname" class="text-danger"></span>
+                            <div class="d-flex gap-2 justify-content-end mt-3">
+                                <a asp-action="List" class="btn btn-outline-secondary">Abbrechen</a>
+                                <button type="submit" class="btn btn-htl">Speichern</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label asp-for="Nachname" class="control-label"></label>
-                <input asp-for="Nachname" class="form-control" value="" />
-                <span asp-validation-for="Nachname" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Sollstunden" class="control-label">Stunden:</label>
-                <input asp-for="Sollstunden" type="number" class="form-control" value="20" />
-                <span asp-validation-for="Sollstunden" class="text-danger"></span>
-            </div>
-
-            <div class="button-group">
-                <a asp-action="Index" class="btn btn-secondary">Zurück zur Liste</a>
-                <input type="submit" value="Erstellen" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</body>
-</html>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

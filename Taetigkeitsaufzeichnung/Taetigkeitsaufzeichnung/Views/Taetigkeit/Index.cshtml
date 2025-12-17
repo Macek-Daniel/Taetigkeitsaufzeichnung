@@ -2,224 +2,114 @@
 
 @{
     ViewData["Title"] = "Tätigkeitsaufzeichnung";
-    Layout = null;
 }
 
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeit-/Aufgabenerfassung</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .time-entry-container {
-            width: 100%;
-            max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .time-entry-form {
-            width: 100%;
-            margin-bottom: 30px;
-        }
-        .input-columns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            width: 100%;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .input-group {
-            width: calc(20% - 15px);
-            min-width: 150px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
-        .input-group label {
-            font-size: 0.9rem;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
-        }
-        .input-wrapper {
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            height: 40px;
-            padding: 0 15px;
-            display: flex;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .input-wrapper input, .input-wrapper select {
-            background: none;
-            border: none;
-            width: 100%;
-            font-size: 1rem;
-            color: #333;
-            outline: none;
-        }
-        .add-button {
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            width: 150px;
-            height: 50px;
-        }
-        .add-button:hover { background-color: #0c60d5; }
-        
-        .history-section {
-            width: 100%;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .history-table { width: 100%; border-collapse: collapse; }
-        .history-table th, .history-table td {
-            border: 1px solid #e0e0e0;
-            padding: 10px;
-            text-align: left;
-            vertical-align: middle;
-        }
-        .history-table th { background-color: #f9f9f9; font-weight: bold; text-align: center; }
-        .text-danger { color: #dc3545; font-size: 0.8rem; }
-        .validation-summary-errors {
-            color: #dc3545; 
-            background-color: #ffe6e6; 
-            padding: 10px; 
-            border-radius: 5px; 
-            margin-bottom: 20px;
-            width: 100%;
-            text-align: left;
-        }
-        .validation-summary-errors ul { margin: 0; padding-left: 20px; }
-    </style>
-</head>
-<body>
+<section id="activity-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <section id="activity-creation-form" class="mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h2 class="h5 mb-3">Neue Tätigkeit erfassen</h2>
 
-    <div class="time-entry-container">
+                            <div asp-validation-summary="All" class="validation-summary mb-3"></div>
 
-        <form asp-action="Create" method="post" class="time-entry-form">
-            
-            <div asp-validation-summary="All" class="validation-summary-errors"></div>
+                            <form asp-action="Create" method="post">
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <label asp-for="NeueTaetigkeit.LehrerID" class="form-label">Lehrer</label>
+                                        <select asp-for="NeueTaetigkeit.LehrerID" asp-items="Model.LehrerListe" class="form-select">
+                                            <option value="">Wählen...</option>
+                                        </select>
+                                        <span asp-validation-for="NeueTaetigkeit.LehrerID" class="text-danger small"></span>
+                                    </div>
 
-            <div class="input-columns">
-                
-                <div class="input-group">
-                    <label asp-for="NeueTaetigkeit.LehrerID">Lehrer</label>
-                    <div class="input-wrapper">
-                        <select asp-for="NeueTaetigkeit.LehrerID" asp-items="Model.LehrerListe">
-                            <option value="" selected>Wählen...</option>
-                        </select>
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <label asp-for="NeueTaetigkeit.Datum" class="form-label">Datum</label>
+                                        <input asp-for="NeueTaetigkeit.Datum" type="date" class="form-control" />
+                                        <span asp-validation-for="NeueTaetigkeit.Datum" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-12 col-lg-3">
+                                        <label asp-for="NeueTaetigkeit.ProjektID" class="form-label">Projekt</label>
+                                        <select asp-for="NeueTaetigkeit.ProjektID" asp-items="Model.ProjektListe" class="form-select">
+                                            <option value="">Projekt...</option>
+                                        </select>
+                                        <span asp-validation-for="NeueTaetigkeit.ProjektID" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-12 col-lg-3">
+                                        <label asp-for="NeueTaetigkeit.DauerStunden" class="form-label">Dauer (h)</label>
+                                        <input asp-for="NeueTaetigkeit.DauerStunden" type="text" placeholder="z.B. 1,5" class="form-control" />
+                                        <span asp-validation-for="NeueTaetigkeit.DauerStunden" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label asp-for="NeueTaetigkeit.Beschreibung" class="form-label">Tätigkeit</label>
+                                        <input asp-for="NeueTaetigkeit.Beschreibung" placeholder="Beschreibung..." class="form-control" />
+                                        <span asp-validation-for="NeueTaetigkeit.Beschreibung" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button type="submit" class="btn btn-htl px-4">Hinzufügen</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    <span asp-validation-for="NeueTaetigkeit.LehrerID" class="text-danger"></span>
-                </div>
+                </section>
 
-                <div class="input-group">
-                    <label asp-for="NeueTaetigkeit.Datum">Datum</label>
-                    <div class="input-wrapper">
-                         <input asp-for="NeueTaetigkeit.Datum" type="date" />
+                <section id="history-section">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <h3 class="h5 mb-0">Historie</h3>
                     </div>
-                    <span asp-validation-for="NeueTaetigkeit.Datum" class="text-danger"></span>
-                </div>
-
-                <div class="input-group" style="flex-grow: 2;">
-                    <label asp-for="NeueTaetigkeit.Beschreibung">Tätigkeit</label>
-                    <div class="input-wrapper">
-                        <input asp-for="NeueTaetigkeit.Beschreibung" placeholder="Beschreibung..." />
+                    <div class="table-responsive">
+                        <table id="history-table" class="table table-striped table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Datum</th>
+                                    <th scope="col">Lehrer</th>
+                                    <th scope="col">Tätigkeit</th>
+                                    <th scope="col">Projekt</th>
+                                    <th scope="col" class="text-center">Dauer</th>
+                                    <th scope="col" class="text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @if (Model.Historie != null && Model.Historie.Any())
+                            {
+                                foreach (var item in Model.Historie)
+                                {
+                                    <tr>
+                                        <td>@item.Datum.ToString("d")</td>
+                                        <td>@item.LehrerName</td>
+                                        <td>@item.Beschreibung</td>
+                                        <td>@item.ProjektName</td>
+                                        <td class="text-center">@item.DauerStunden.ToString("0.##") h</td>
+                                        <td class="text-center">
+                                            <form asp-action="Delete" asp-route-id="@item.TaetigkeitID" method="post" onsubmit="return confirm('Löschen?');" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Löschen">X</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">Keine Einträge.</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
                     </div>
-                    <span asp-validation-for="NeueTaetigkeit.Beschreibung" class="text-danger"></span>
-                </div>
-
-                <div class="input-group">
-                    <label asp-for="NeueTaetigkeit.ProjektID">Projekt</label>
-                    <div class="input-wrapper">
-                        <select asp-for="NeueTaetigkeit.ProjektID" asp-items="Model.ProjektListe">
-                            <option value="" selected>Projekt...</option>
-                        </select>
-                    </div>
-                    <span asp-validation-for="NeueTaetigkeit.ProjektID" class="text-danger"></span>
-                </div>
-
-                <div class="input-group">
-                    <label asp-for="NeueTaetigkeit.DauerStunden">Dauer (h)</label>
-                    <div class="input-wrapper">
-                        <input asp-for="NeueTaetigkeit.DauerStunden" type="text" placeholder="z.B. 1,5" />
-                    </div>
-                    <span asp-validation-for="NeueTaetigkeit.DauerStunden" class="text-danger"></span>
-                </div>
+                </section>
             </div>
-
-            <div style="text-align: right;">
-                <button type="submit" class="add-button">Hinzufügen</button>
-            </div>
-        </form>
-
-        <div class="history-section">
-            <h3>Historie</h3>
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Lehrer</th>
-                        <th>Tätigkeit</th>
-                        <th>Projekt</th>
-                        <th>Dauer</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.Historie != null && Model.Historie.Any())
-                    {
-                        foreach (var item in Model.Historie)
-                        {
-                            <tr>
-                                <td>@item.Datum.ToString("d")</td>
-                                <td>@item.LehrerName</td>
-                                <td>@item.Beschreibung</td>
-                                <td>@item.ProjektName</td>
-                                <td style="text-align: center;">@item.DauerStunden.ToString("0.##") h</td>
-                                <td style="text-align: center;">
-                                    <form asp-action="Delete" asp-route-id="@item.TaetigkeitID" method="post" onsubmit="return confirm('Löschen?');">
-                                        <button type="submit" style="background:none;border:none;color:red;cursor:pointer;font-weight:bold;">X</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr><td colspan="6" style="text-align:center;color:#999;">Keine Einträge.</td></tr>
-                    }
-                </tbody>
-            </table>
         </div>
     </div>
+</section>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
-</body>
-</html>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

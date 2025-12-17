@@ -10,7 +10,10 @@ namespace Taetigkeitsaufzeichnung.ViewModels
         public bool IsActive { get; set; }
         public string FullName => $"{Vorname} {Nachname}";
         public decimal Sollstunden { get; set; }
+        public decimal FehlendeStunden => Math.Max(Sollstunden - 23, 0);
 
+        // 3. Prüft automatisch, ob das Ziel erreicht wurde (true/false)
+        public bool IstErreicht => 23 >= Sollstunden;
     }
 
     public class LehrerCreateViewModel
@@ -39,5 +42,13 @@ namespace Taetigkeitsaufzeichnung.ViewModels
 
         [Display(Name = "Aktiv")]
         public bool IsActive { get; set; }
+    }
+
+    public class LehrerDashboardViewModel
+    {
+        public List<LehrerIndexViewModel> LehrerListe { get; set; } = new();
+        public decimal GesamtFehlend { get; set; }
+        public int AnzahlLehrerErreicht { get; set; }
+        public int AnzahlLehrerGesamt { get; set; }
     }
 }

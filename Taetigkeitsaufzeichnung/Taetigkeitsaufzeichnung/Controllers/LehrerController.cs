@@ -71,7 +71,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     _context.Add(lehrerSchuljahrSollstunden);
                     await _context.SaveChangesAsync();
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(List));
             }
             return View(vm); 
         }
@@ -140,7 +140,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(List));
             }
             return View(vm);
         }
@@ -161,7 +161,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
             _context.Update(lehrer);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(List));
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -185,7 +185,42 @@ namespace Taetigkeitsaufzeichnung.Controllers
             _context.Lehrer.Remove(lehrer);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(List));
+        }
+        
+        public async Task<IActionResult> List(string searchString)
+        {
+            ViewData["CurrentFilter"] = searchString;
+
+            var lehrerQuery = _context.Lehrer.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                lehrerQuery = lehrerQuery.Where(s => s.Nachname.Contains(searchString) 
+                                                     || s.Vorname.Contains(searchString));
+            }
+
+            var lehrerEntities = await lehrerQuery.ToListAsync();
+
+            // Mapping
+            var lehrerListe = lehrerEntities.Select(l => new LehrerIndexViewModel
+            {
+                LehrerID = l.LehrerID,
+                Vorname = l.Vorname,
+                Nachname = l.Nachname,
+                Sollstunden = 23
+                //IstStunden = 0 
+            }).ToList();
+
+            var model = new LehrerDashboardViewModel
+            {
+                LehrerListe = lehrerListe,
+                GesamtFehlend = lehrerListe.Sum(x => x.FehlendeStunden),
+                AnzahlLehrerErreicht = lehrerListe.Count(x => x.IstErreicht),
+                AnzahlLehrerGesamt = lehrerListe.Count
+            };
+
+            return View(model);
         }
     }
 }
