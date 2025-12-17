@@ -1,0 +1,33 @@
+@model Taetigkeitsaufzeichnung.Models.Abteilungsvorstand
+
+@{
+    ViewData["Title"] = "Abteilungsvorstand anlegen";
+}
+
+<div class="container py-3">
+    <h2 class="h5 mb-3">Neuer Abteilungsvorstand</h2>
+    <form asp-action="Create" method="post" class="card p-3">
+        <div class="mb-3">
+            <label class="form-label" for="AbteilungID">Abteilung</label>
+            <select asp-for="AbteilungID" asp-items="ViewBag.Abteilungen" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="LehrerID">Lehrer</label>
+            <select asp-for="LehrerID" asp-items="ViewBag.Lehrer" class="form-select"></select>
+        </div>
+        <div class="mb-3">
+            <label asp-for="StartDatum" class="form-label"></label>
+            <input asp-for="StartDatum" class="form-control" type="date" />
+        </div>
+        <div class="mb-3">
+            <label asp-for="EndDatum" class="form-label"></label>
+            <input asp-for="EndDatum" class="form-control" type="date" />
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-htl">Speichern</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Abbrechen</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

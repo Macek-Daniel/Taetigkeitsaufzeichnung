@@ -90,7 +90,7 @@
                     <tr class="table-secondary">
                         <th class="text-center">Lehrername</th>
                         <th class="text-center">Zu erreichende Stunden</th>
-                        <th class="text-center">Löschen</th>
+                        <th class="text-center">Aktion</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,8 +104,8 @@
                             </td>
 
                             <td class="text-center">
-                                <form asp-action="Delete" asp-route-id="@item.LehrerID" method="post">
-                                    <button type="submit" class="btn btn-danger btn-block">Löschen</button>
+                                <form asp-action="ToggleActivity" asp-route-id="@item.LehrerID" method="post">
+                                    <button type="submit" class="btn btn-secondary btn-block">Aktiv/Inaktiv</button>
                                 </form>
                             </td>
                         </tr>

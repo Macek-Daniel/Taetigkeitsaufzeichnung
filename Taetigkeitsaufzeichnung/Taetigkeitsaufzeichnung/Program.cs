@@ -11,6 +11,9 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// Fail fast with clear guidance if the database schema is missing
+DatabaseStartupChecker.EnsureSchemaOrThrow(app.Services);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -20,16 +23,16 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Lehrer}/{action=Index}/")
-    .WithStaticAssets();
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapStaticAssets();
 
 
 app.Run();

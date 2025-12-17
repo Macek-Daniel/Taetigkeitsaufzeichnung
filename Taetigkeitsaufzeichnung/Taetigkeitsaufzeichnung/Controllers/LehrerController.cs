@@ -17,9 +17,32 @@ namespace Taetigkeitsaufzeichnung.Controllers
             _context = context;
         }
 
+        private async Task<int> GetActiveSchuljahrIdAsync()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            var current = await _context.Schuljahre
+                .Where(s => s.Startdatum <= today && s.Enddatum >= today)
+                .OrderByDescending(s => s.SchuljahrID)
+                .Select(s => s.SchuljahrID)
+                .FirstOrDefaultAsync();
+
+            if (current != 0)
+            {
+                return current;
+            }
+
+            var latest = await _context.Schuljahre
+                .OrderByDescending(s => s.SchuljahrID)
+                .Select(s => s.SchuljahrID)
+                .FirstOrDefaultAsync();
+
+            return latest != 0 ? latest : 2; // Fallback to seeded ID 2 if DB empty
+        }
+
         public async Task<IActionResult> Index()
         {
-            int currentSchuljahrId = 2;
+            int currentSchuljahrId = await GetActiveSchuljahrIdAsync();
             var lehrer = await _context.Lehrer
                 .OrderBy(l => l.Nachname)
                 .ThenBy(l => l.Vorname)
@@ -32,10 +55,15 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     Sollstunden = _context.LehrerSchuljahrSollstunden
                         .Where(ls => ls.LehrerID == l.LehrerID && ls.SchuljahrID == currentSchuljahrId)
                         .Select(ls => ls.Sollstunden)
-                        .FirstOrDefault()                })
+                        .FirstOrDefault(),
+                    IstStunden = _context.Taetigkeiten
+                        .Where(t => t.LehrerID == l.LehrerID)
+                        .Sum(t => t.DauerStunden),
+                    AnzahlAbteilungsvorstaende = _context.Abteilungsvorstaende.Count(av => av.LehrerID == l.LehrerID)
+                })
                 .ToListAsync();
-            
-            return View(lehrer); 
+
+            return View(lehrer);
         }
 
         public IActionResult Create()
@@ -47,7 +75,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(LehrerCreateViewModel vm)
         {
-            int currentSchuljahrId = 2;
+            int currentSchuljahrId = await GetActiveSchuljahrIdAsync();
             if (ModelState.IsValid)
             {
                 var lehrer = new Lehrer
@@ -89,14 +117,21 @@ namespace Taetigkeitsaufzeichnung.Controllers
                 return NotFound();
             }
 
+            int currentSchuljahrId = await GetActiveSchuljahrIdAsync();
+            var sollstunden = await _context.LehrerSchuljahrSollstunden
+                .Where(ls => ls.LehrerID == lehrer.LehrerID && ls.SchuljahrID == currentSchuljahrId)
+                .Select(ls => ls.Sollstunden)
+                .FirstOrDefaultAsync();
+
             var vm = new LehrerEditViewModel
             {
                 LehrerID = lehrer.LehrerID,
                 Vorname = lehrer.Vorname,
                 Nachname = lehrer.Nachname,
-                IsActive = lehrer.IsActive
+                IsActive = lehrer.IsActive,
+                Sollstunden = sollstunden
             };
-            
+
             return View(vm);
         }
 
@@ -127,6 +162,28 @@ namespace Taetigkeitsaufzeichnung.Controllers
                     lehrer.IsActive = vm.IsActive;
 
                     _context.Update(lehrer);
+                    await _context.SaveChangesAsync();
+
+                    // Update Sollstunden for current Schuljahr
+                    int currentSchuljahrId = await GetActiveSchuljahrIdAsync();
+                    var sollstundenEntry = await _context.LehrerSchuljahrSollstunden
+                        .FirstOrDefaultAsync(ls => ls.LehrerID == id && ls.SchuljahrID == currentSchuljahrId);
+
+                    if (sollstundenEntry != null)
+                    {
+                        sollstundenEntry.Sollstunden = vm.Sollstunden;
+                        _context.Update(sollstundenEntry);
+                    }
+                    else
+                    {
+                        _context.Add(new LehrerSchuljahrSollstunden
+                        {
+                            LehrerID = id,
+                            SchuljahrID = currentSchuljahrId,
+                            Sollstunden = vm.Sollstunden
+                        });
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -163,44 +220,46 @@ namespace Taetigkeitsaufzeichnung.Controllers
 
             return RedirectToAction(nameof(List));
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var lehrer = await _context.Lehrer
-                .Include(l => l.Taetigkeiten)
-                .Include(l => l.SchuljahrSollstunden)
-                .FirstOrDefaultAsync(l => l.LehrerID == id);
-                    
-            if (lehrer == null)
-            {
-                return NotFound();
-            }
 
-            // Remove all related records first
-            _context.Taetigkeiten.RemoveRange(lehrer.Taetigkeiten);
-            _context.LehrerSchuljahrSollstunden.RemoveRange(lehrer.SchuljahrSollstunden);
-                
-            // Then remove the teacher
-            _context.Lehrer.Remove(lehrer);
-            await _context.SaveChangesAsync();
+        // Hard delete is intentionally disabled; use ToggleActivity instead.
 
-            return RedirectToAction(nameof(List));
-        }
-        
-        public async Task<IActionResult> List(string searchString)
+        public async Task<IActionResult> List(string searchString, string statusFilter = "active")
         {
             ViewData["CurrentFilter"] = searchString;
+            ViewData["StatusFilter"] = statusFilter;
 
             var lehrerQuery = _context.Lehrer.AsQueryable();
 
+            // Filter by status
+            if (statusFilter == "active")
+            {
+                lehrerQuery = lehrerQuery.Where(l => l.IsActive);
+            }
+            else if (statusFilter == "inactive")
+            {
+                lehrerQuery = lehrerQuery.Where(l => !l.IsActive);
+            }
+            // "all" shows all teachers, no filter needed
+
             if (!string.IsNullOrEmpty(searchString))
             {
-                lehrerQuery = lehrerQuery.Where(s => s.Nachname.Contains(searchString) 
+                lehrerQuery = lehrerQuery.Where(s => s.Nachname.Contains(searchString)
                                                      || s.Vorname.Contains(searchString));
             }
 
             var lehrerEntities = await lehrerQuery.ToListAsync();
+
+            // Use current Schuljahr for Sollstunden lookup
+            int currentSchuljahrId = await GetActiveSchuljahrIdAsync();
+            var sollstundenMap = await _context.LehrerSchuljahrSollstunden
+                .Where(ls => ls.SchuljahrID == currentSchuljahrId)
+                .ToDictionaryAsync(ls => ls.LehrerID, ls => ls.Sollstunden);
+
+            // Get IstStunden for all Lehrer
+            var istStundenMap = await _context.Taetigkeiten
+                .GroupBy(t => t.LehrerID)
+                .Select(g => new { LehrerID = g.Key, IstStunden = g.Sum(t => t.DauerStunden) })
+                .ToDictionaryAsync(x => x.LehrerID, x => x.IstStunden);
 
             // Mapping
             var lehrerListe = lehrerEntities.Select(l => new LehrerIndexViewModel
@@ -208,8 +267,10 @@ namespace Taetigkeitsaufzeichnung.Controllers
                 LehrerID = l.LehrerID,
                 Vorname = l.Vorname,
                 Nachname = l.Nachname,
-                Sollstunden = 23
-                //IstStunden = 0 
+                IsActive = l.IsActive,
+                Sollstunden = sollstundenMap.TryGetValue(l.LehrerID, out var s) ? s : 0,
+                IstStunden = istStundenMap.TryGetValue(l.LehrerID, out var ist) ? ist : 0,
+                AnzahlAbteilungsvorstaende = _context.Abteilungsvorstaende.Count(av => av.LehrerID == l.LehrerID)
             }).ToList();
 
             var model = new LehrerDashboardViewModel

@@ -15,9 +15,20 @@ namespace Taetigkeitsaufzeichnung.Data
         public DbSet<Projekt> Projekte { get; set; }
         public DbSet<Taetigkeit> Taetigkeiten { get; set; }
         public DbSet<LehrerSchuljahrSollstunden> LehrerSchuljahrSollstunden { get; set; }
+        public DbSet<Abteilung> Abteilungen { get; set; }
+        public DbSet<Abteilungsvorstand> Abteilungsvorstaende { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Align table names with the SQL script (singular names where applicable)
+            modelBuilder.Entity<Lehrer>().ToTable("Lehrer");
+            modelBuilder.Entity<Schuljahr>().ToTable("Schuljahr");
+            modelBuilder.Entity<Projekt>().ToTable("Projekt");
+            modelBuilder.Entity<Taetigkeit>().ToTable("Taetigkeit");
+            modelBuilder.Entity<LehrerSchuljahrSollstunden>().ToTable("LehrerSchuljahrSollstunden");
+            modelBuilder.Entity<Abteilung>().ToTable("Abteilung");
+            modelBuilder.Entity<Abteilungsvorstand>().ToTable("Abteilungsvorstand");
+
             modelBuilder.Entity<LehrerSchuljahrSollstunden>()
                 .HasKey(lss => new { lss.LehrerID, lss.SchuljahrID });
 
@@ -44,6 +55,28 @@ namespace Taetigkeitsaufzeichnung.Data
                 .WithMany(s => s.LehrerSollstunden)
                 .HasForeignKey(lss => lss.SchuljahrID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Abteilungsvorstand-Beziehungen
+            modelBuilder.Entity<Abteilungsvorstand>()
+                .HasOne(av => av.Lehrer)
+                .WithMany(l => l.Abteilungsvorstaende)
+                .HasForeignKey(av => av.LehrerID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Abteilungsvorstand>()
+                .HasOne(av => av.Abteilung)
+                .WithMany(a => a.Vorstaende)
+                .HasForeignKey(av => av.AbteilungID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Dezimaltypen explizit konfigurieren
+            modelBuilder.Entity<LehrerSchuljahrSollstunden>()
+                .Property(lss => lss.Sollstunden)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Taetigkeit>()
+                .Property(t => t.DauerStunden)
+                .HasPrecision(18, 2);
         }
     }
 }

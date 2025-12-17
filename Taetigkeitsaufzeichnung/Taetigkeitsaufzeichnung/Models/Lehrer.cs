@@ -19,5 +19,6 @@ namespace Taetigkeitsaufzeichnung.Models
 
         public ICollection<Taetigkeit> Taetigkeiten { get; set; }
         public ICollection<LehrerSchuljahrSollstunden> SchuljahrSollstunden { get; set; }
+        public ICollection<Abteilungsvorstand> Abteilungsvorstaende { get; set; } = new List<Abteilungsvorstand>();
     }
 }
