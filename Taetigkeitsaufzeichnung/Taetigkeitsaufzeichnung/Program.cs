@@ -1,38 +1,50 @@
 using Taetigkeitsaufzeichnung.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// 1. Authentifizierung hinzufügen (NEU)
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddDbContext<TaetigkeitsaufzeichnungContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// 2. UI Support für Login hinzufügen (GEÄNDERT)
+builder.Services.AddControllersWithViews()
+    .AddMicrosoftIdentityUI();
+
+// Razor Pages werden für die Login-UI benötigt
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
-
-// Fail fast with clear guidance if the database schema is missing
-DatabaseStartupChecker.EnsureSchemaOrThrow(app.Services);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseRouting();
 
+// 3. Reihenfolge ist wichtig: Erst Authentication, dann Authorization (NEU)
+app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Taetigkeit}/{action=Index}");
 
 app.MapStaticAssets();
 
+app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
+// Login-Seiten mappen (NEU)
+app.MapRazorPages()
+   .WithStaticAssets();
 
 app.Run();
