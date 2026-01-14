@@ -2,9 +2,13 @@
   Datenbank-Initialisierungsskript (SQL Server)
   - Legt Tabellen, Primär-/Fremdschlüssel und Indizes an
   - Abbild der aktuellen EF-Modelle inkl. Abteilung/Abteilungsvorstand
+  - Abbild der aktuellen EF-Modelle mit Azure AD Object ID (NVARCHAR(36)) als LehrerID
   Hinweis: Dieses Skript ist für Microsoft SQL Server (T-SQL) ausgelegt.
 */
-
+DROP DATABASE IF EXISTS [Taetigkeitsaufzeichnung];
+CREATE DATABASE [Taetigkeitsaufzeichnung];
+GO
+USE [Taetigkeitsaufzeichnung];
 SET NOCOUNT ON;
 
 /* In korrekter Reihenfolge löschen (abhängige Tabellen zuerst) */
@@ -19,9 +23,12 @@ IF OBJECT_ID(N'[dbo].[Lehrer]', 'U') IS NOT NULL DROP TABLE [dbo].[Lehrer];
 /* Basis-Tabellen */
 CREATE TABLE [dbo].[Lehrer]
 (
-    [LehrerID]  INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Lehrer] PRIMARY KEY,
+    [LehrerID]  NVARCHAR(36)       NOT NULL CONSTRAINT [PK_Lehrer] PRIMARY KEY,
     [Vorname]   NVARCHAR(100)      NOT NULL,
     [Nachname]  NVARCHAR(100)      NOT NULL,
+    [Email]     NVARCHAR(256)      NOT NULL,
+    [LoginName] NVARCHAR(256)      NULL,
+    [CreatedAt] DATETIME2          NOT NULL CONSTRAINT [DF_Lehrer_CreatedAt] DEFAULT(GETUTCDATE()),
     [IsActive]  BIT                NOT NULL CONSTRAINT [DF_Lehrer_IsActive] DEFAULT(1)
 );
 
@@ -62,7 +69,7 @@ CREATE TABLE [dbo].[Taetigkeit]
     [Datum]        DATE               NOT NULL,
     [Beschreibung] NVARCHAR(MAX)      NOT NULL,
     [DauerStunden] DECIMAL(18,2)      NOT NULL CONSTRAINT [DF_Taetigkeit_DauerStunden] DEFAULT(0),
-    [LehrerID]     INT                NOT NULL,
+    [LehrerID]     NVARCHAR(36)       NOT NULL,
     [ProjektID]    INT                NOT NULL
 );
 
@@ -81,7 +88,7 @@ CREATE INDEX [IX_Taetigkeit_ProjektID] ON [dbo].[Taetigkeit]([ProjektID]);
 
 CREATE TABLE [dbo].[LehrerSchuljahrSollstunden]
 (
-    [LehrerID]    INT            NOT NULL,
+    [LehrerID]    NVARCHAR(36)   NOT NULL,
     [SchuljahrID] INT            NOT NULL,
     [Sollstunden] DECIMAL(18,2)  NOT NULL CONSTRAINT [DF_LSS_Sollstunden] DEFAULT(0),
     CONSTRAINT [PK_LehrerSchuljahrSollstunden] PRIMARY KEY ([LehrerID], [SchuljahrID])
@@ -100,7 +107,7 @@ CREATE TABLE [dbo].[Abteilungsvorstand]
 (
     [AbteilungsvorstandID] INT IDENTITY(1,1) NOT NULL CONSTRAINT [PK_Abteilungsvorstand] PRIMARY KEY,
     [AbteilungID]          INT                NOT NULL,
-    [LehrerID]             INT                NOT NULL,
+    [LehrerID]             NVARCHAR(36)       NOT NULL,
     [StartDatum]           DATE               NULL,
     [EndDatum]             DATE               NULL
 );
@@ -141,3 +148,4 @@ BEGIN
 END
 
 PRINT N'Datenbankschema wurde eingerichtet.';
+PRINT N'LehrerID ist jetzt NVARCHAR(36) für Azure AD Object ID.';

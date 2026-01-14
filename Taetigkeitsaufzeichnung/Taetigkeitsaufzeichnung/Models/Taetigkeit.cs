@@ -17,7 +17,7 @@ namespace Taetigkeitsaufzeichnung.Models
         public decimal DauerStunden { get; set; }
 
         // Foreign Keys
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
         public int ProjektID { get; set; }
 
         // Navigations-Properties

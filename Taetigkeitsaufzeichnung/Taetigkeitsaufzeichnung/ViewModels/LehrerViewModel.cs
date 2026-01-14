@@ -4,7 +4,7 @@ namespace Taetigkeitsaufzeichnung.ViewModels
 {
     public class LehrerIndexViewModel
     {
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
         public string Vorname { get; set; }
         public string Nachname { get; set; }
         public bool IsActive { get; set; }
@@ -32,7 +32,7 @@ namespace Taetigkeitsaufzeichnung.ViewModels
 
     public class LehrerEditViewModel
     {
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
 
         [Required(ErrorMessage = "Vorname ist erforderlich")]
         [StringLength(100)]

@@ -104,9 +104,9 @@ namespace Taetigkeitsaufzeichnung.Controllers
             return View(vm); 
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string id)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
@@ -138,7 +138,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
         // POST: Lehrer/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LehrerEditViewModel vm)
+        public async Task<IActionResult> Edit(string id, LehrerEditViewModel vm)
         {
             if (id != vm.LehrerID)
             {
@@ -206,7 +206,7 @@ namespace Taetigkeitsaufzeichnung.Controllers
         // POST: Lehrer/ToggleActivity/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ToggleActivity(int id)
+        public async Task<IActionResult> ToggleActivity(string id)
         {
             var lehrer = await _context.Lehrer.FindAsync(id);
             if (lehrer == null)

@@ -4,7 +4,7 @@ namespace Taetigkeitsaufzeichnung.Models
 {
     public class LehrerSchuljahrSollstunden
     {
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
         public int SchuljahrID { get; set; }
 
         public decimal Sollstunden { get; set; }

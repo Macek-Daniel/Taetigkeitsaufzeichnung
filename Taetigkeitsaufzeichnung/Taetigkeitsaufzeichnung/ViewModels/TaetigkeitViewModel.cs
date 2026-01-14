@@ -24,7 +24,7 @@ namespace Taetigkeitsaufzeichnung.ViewModels
 
         [Required(ErrorMessage = "Bitte wählen Sie einen Lehrer aus.")]
         [Display(Name = "Lehrer")]
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
 
         [Required(ErrorMessage = "Bitte wählen Sie ein Projekt aus.")]
         [Display(Name = "Projekt")]
@@ -48,5 +48,8 @@ namespace Taetigkeitsaufzeichnung.ViewModels
         
         public IEnumerable<SelectListItem> LehrerListe { get; set; }
         public IEnumerable<SelectListItem> ProjektListe { get; set; }
+
+        public string CurrentLehrerID { get; set; }
+        public string CurrentLehrerName { get; set; }
     }
 }

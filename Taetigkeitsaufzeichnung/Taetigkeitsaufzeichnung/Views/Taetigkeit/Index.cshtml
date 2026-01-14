@@ -16,15 +16,10 @@
                             <div asp-validation-summary="All" class="validation-summary mb-3"></div>
 
                             <form asp-action="Create" method="post">
-                                <div class="row g-3">
-                                    <div class="col-12 col-sm-6 col-lg-3">
-                                        <label asp-for="NeueTaetigkeit.LehrerID" class="form-label">Lehrer</label>
-                                        <select asp-for="NeueTaetigkeit.LehrerID" asp-items="Model.LehrerListe" class="form-select">
-                                            <option value="">Wählen...</option>
-                                        </select>
-                                        <span asp-validation-for="NeueTaetigkeit.LehrerID" class="text-danger small"></span>
-                                    </div>
+                                <!-- Lehrer wird automatisch aus Azure AD gesetzt -->
+                                <input type="hidden" asp-for="NeueTaetigkeit.LehrerID" />
 
+                                <div class="row g-3">
                                     <div class="col-12 col-sm-6 col-lg-3">
                                         <label asp-for="NeueTaetigkeit.Datum" class="form-label">Datum</label>
                                         <input asp-for="NeueTaetigkeit.Datum" type="date" class="form-control" />
@@ -39,7 +34,7 @@
                                         <span asp-validation-for="NeueTaetigkeit.ProjektID" class="text-danger small"></span>
                                     </div>
 
-                                    <div class="col-12 col-lg-3">
+                                    <div class="col-12 col-lg-2">
                                         <label asp-for="NeueTaetigkeit.DauerStunden" class="form-label">Dauer (h)</label>
                                         <input asp-for="NeueTaetigkeit.DauerStunden" type="text" placeholder="z.B. 1,5" class="form-control" />
                                         <span asp-validation-for="NeueTaetigkeit.DauerStunden" class="text-danger small"></span>

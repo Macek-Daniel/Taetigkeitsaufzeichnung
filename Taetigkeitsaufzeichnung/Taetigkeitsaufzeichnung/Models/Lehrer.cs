@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -5,7 +6,9 @@ namespace Taetigkeitsaufzeichnung.Models
 {
     public class Lehrer
     {
-        public int LehrerID { get; set; }
+        [Key]
+        [StringLength(36)]
+        public string LehrerID { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -14,6 +17,15 @@ namespace Taetigkeitsaufzeichnung.Models
         [Required]
         [StringLength(100)]
         public string Nachname { get; set; }
+
+        [Required]
+        [StringLength(256)]
+        public string Email { get; set; }
+
+        [StringLength(256)]
+        public string LoginName { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsActive { get; set; } = true;
 

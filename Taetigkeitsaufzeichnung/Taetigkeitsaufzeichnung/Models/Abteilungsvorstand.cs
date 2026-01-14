@@ -11,7 +11,7 @@ namespace Taetigkeitsaufzeichnung.Models
         public int AbteilungID { get; set; }
 
         [Required]
-        public int LehrerID { get; set; }
+        public string LehrerID { get; set; }
 
         public DateOnly? StartDatum { get; set; }
         public DateOnly? EndDatum { get; set; }
