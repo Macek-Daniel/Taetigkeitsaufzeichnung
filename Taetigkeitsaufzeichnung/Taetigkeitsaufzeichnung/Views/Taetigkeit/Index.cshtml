@@ -28,9 +28,14 @@
 
                                     <div class="col-12 col-lg-3">
                                         <label asp-for="NeueTaetigkeit.ProjektID" class="form-label">Projekt</label>
-                                        <select asp-for="NeueTaetigkeit.ProjektID" asp-items="Model.ProjektListe" class="form-select">
-                                            <option value="">Projekt...</option>
-                                        </select>
+                                        <div class="input-group">
+                                            <select asp-for="NeueTaetigkeit.ProjektID" asp-items="Model.ProjektListe" class="form-select" id="projektSelect">
+                                                <option value="">Projekt...</option>
+                                            </select>
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newProjektModal" title="Neues Projekt erstellen">
+                                                +
+                                            </button>
+                                        </div>
                                         <span asp-validation-for="NeueTaetigkeit.ProjektID" class="text-danger small"></span>
                                     </div>
 
@@ -107,4 +112,73 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        document.getElementById('newProjektBtn')?.addEventListener('click', async function() {
+            const projektName = document.getElementById('projektNameInput').value;
+            
+            if (!projektName.trim()) {
+                alert('Bitte geben Sie einen Projektnamen ein.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/Taetigkeit/CreateProjekt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]')?.value
+                    },
+                    body: JSON.stringify({ projektname: projektName })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Füge das neue Projekt zum Dropdown hinzu
+                    const select = document.getElementById('projektSelect');
+                    const option = document.createElement('option');
+                    option.value = data.projektID;
+                    option.textContent = data.projektname;
+                    select.appendChild(option);
+                    
+                    // Setze das neue Projekt als ausgewählt
+                    select.value = data.projektID;
+                    
+                    // Schließe das Modal
+                    bootstrap.Modal.getInstance(document.getElementById('newProjektModal')).hide();
+                    
+                    // Leere das Inputfeld
+                    document.getElementById('projektNameInput').value = '';
+                } else {
+                    alert('Fehler beim Erstellen des Projekts.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ein Fehler ist aufgetreten.');
+            }
+        });
+    </script>
 }
+
+<!-- Modal für neues Projekt -->
+<div class="modal fade" id="newProjektModal" tabindex="-1" aria-labelledby="newProjektModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newProjektModalLabel">Neues Projekt erstellen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="projektNameInput" class="form-label">Projektname</label>
+                    <input type="text" class="form-control" id="projektNameInput" placeholder="z.B. Neue Initiative">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-htl" id="newProjektBtn">Erstellen</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -39,9 +39,9 @@ app.UseAuthorization();
 app.MapStaticAssets();
 
 app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Taetigkeit}/{action=Index}/")
-    .WithStaticAssets();
+    name: "default",
+    pattern: "{controller=Taetigkeit}/{action=Index}/{id?}")
+.WithStaticAssets();
 
 // Login-Seiten mappen (NEU)
 app.MapRazorPages()

@@ -33,16 +33,30 @@ namespace Taetigkeitsaufzeichnung.Controllers
         /// </summary>
         private (string givenName, string surname, string email) GetUserInfo()
         {
-            // Versuchen Sie verschiedene Claim-Namen für givenname
+            // Versuchen Sie separate given_name und family_name Claims zu finden
             var givenName = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname")?.Value
                          ?? User.FindFirst("given_name")?.Value
-                         ?? User.FindFirst("name")?.Value
-                         ?? "User";
+                         ?? "";
 
-            // Versuchen Sie verschiedene Claim-Namen für surname
             var surname = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname")?.Value
                        ?? User.FindFirst("family_name")?.Value
                        ?? "";
+
+            // Falls nur ein "name" Claim verfügbar ist, splitten Sie ihn
+            if (string.IsNullOrEmpty(givenName) && string.IsNullOrEmpty(surname))
+            {
+                var fullName = User.FindFirst("name")?.Value
+                            ?? User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value
+                            ?? "User";
+
+                var parts = fullName.Split(' ', 2);
+                givenName = parts[0];
+                surname = parts.Length > 1 ? parts[1] : "";
+            }
+
+            // Falls noch immer nur givenName, aber kein surname, setzen Sie defaults
+            if (string.IsNullOrEmpty(givenName))
+                givenName = "User";
 
             // Versuchen Sie verschiedene E-Mail Claims
             var email = User.FindFirst(ClaimTypes.Email)?.Value
@@ -201,5 +215,31 @@ namespace Taetigkeitsaufzeichnung.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: Taetigkeit/CreateProjekt
+        [HttpPost]
+        public async Task<IActionResult> CreateProjekt([FromBody] CreateProjektRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.Projektname))
+                return BadRequest(new { message = "Projektname erforderlich" });
+
+            try
+            {
+                var projekt = new Projekt { Projektname = request.Projektname };
+                _context.Add(projekt);
+                await _context.SaveChangesAsync();
+
+                return Json(new { projektID = projekt.ProjektID, projektname = projekt.Projektname });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+    }
+
+    public class CreateProjektRequest
+    {
+        public string Projektname { get; set; }
     }
 }
